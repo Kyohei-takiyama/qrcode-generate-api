@@ -23,7 +23,7 @@ resource "aws_api_gateway_integration" "integration" {
   http_method             = aws_api_gateway_method.api_method.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.lambda_function.invoke_arn
+  uri                     = var.lambda_function_uri
   depends_on              = [aws_api_gateway_method.api_method]
 
 }
@@ -58,7 +58,7 @@ resource "aws_api_gateway_method_response" "response" {
 
 resource "aws_lambda_permission" "api_gateway" {
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda_function.function_name
+  function_name = var.lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.api.execution_arn}/*/${aws_api_gateway_method.api_method.http_method}/${aws_api_gateway_resource.root.path_part}"
 }

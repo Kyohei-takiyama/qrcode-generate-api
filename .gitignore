@@ -33,3 +33,10 @@ archive.zip
 .env.*
 
 packages
+.terraform
+terraform/build/layer
+terraform.tfstate.backup
+.terraform.lock.hcl
+*.tfstate
+/terraform/lambda
+./app/__pycache__/

@@ -1,13 +1,13 @@
 # Archive
 data "archive_file" "layer_zip" {
   type        = "zip"
-  source_dir  = "${path.module}/build/layer"
-  output_path = "${path.module}/lambda/layer.zip"
+  source_dir  = "${path.module}/../../build/layer"
+  output_path = "${path.module}/../../lambda/layer.zip"
 }
 data "archive_file" "function_zip" {
   type        = "zip"
-  source_dir  = "${path.module}/build/function"
-  output_path = "${path.module}/lambda/function.zip"
+  source_dir  = "${path.module}/../../build/function"
+  output_path = "${path.module}/../../lambda/function.zip"
 }
 
 #  Lambda Layer
