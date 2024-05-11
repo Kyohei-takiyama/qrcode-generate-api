@@ -1,0 +1,6 @@
+uvicorn
+fastapi
+mangum
+aws-lambda-powertools
+qrcode
+Pillow
