@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
@@ -30,12 +30,17 @@ def generate_qrcode(url: str):
 
     img = qr.make_image(fill_color="black", black_color="white")
 
-    # Save image to BytesIO
-    img_io = BytesIO()
-    img.save(img_io, format="PNG")
-    img_io.seek(0)
+    img_bytes = BytesIO()
+    img.save(img_bytes, format="PNG")
+    img_bytes.seek(0)
 
-    return Response(content=img_io.getvalue(), media_type="image/png")
+    print("QR code generated")
+    print("URL: ", url)
+    print("QR code: ", img_bytes.getvalue())
+    print("QR code type: ", type(img_bytes.getvalue()))
+    print("QR code length: ", len(img_bytes.getvalue()))
+
+    return Response(content=img_bytes.getvalue(), media_type="image/png")
 
 
 handler = Mangum(app)
