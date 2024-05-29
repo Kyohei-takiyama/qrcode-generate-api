@@ -10,6 +10,7 @@ module "apigateway" {
 module "lambda" {
   source = "../../modules/lambda"
 
-  env_prefix   = local.env_prefix
-  service_name = local.service_name
+  env_prefix      = local.env_prefix
+  service_name    = local.service_name
+  image_repo_name = local.image_repo_name
 }

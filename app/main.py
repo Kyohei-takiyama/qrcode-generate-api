@@ -1,15 +1,15 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 import qrcode
 from io import BytesIO
 
-
-app = FastAPI()
+app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -17,8 +17,11 @@ app.add_middleware(
 
 @app.get("/qrcode")
 def generate_qrcode(url: str):
+    # check url is blank
+    if not url:
+        raise HTTPException(status_code=400, detail="URL is required")
 
-    # Generate QR code
+    # generate qrcode
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -28,24 +31,15 @@ def generate_qrcode(url: str):
     qr.add_data(url)
     qr.make(fit=True)
 
-    img = qr.make_image(fill_color="black", black_color="white")
+    img = qr.make_image(fill_color="black", back_color="white")
 
+    # save qrcode as bytes
     img_bytes = BytesIO()
     img.save(img_bytes, format="PNG")
     img_bytes.seek(0)
 
-    print("QR code generated")
-    print("URL: ", url)
-    print("QR code: ", img_bytes.getvalue())
-    print("QR code type: ", type(img_bytes.getvalue()))
-    print("QR code length: ", len(img_bytes.getvalue()))
-
+    # return png image with response
     return Response(content=img_bytes.getvalue(), media_type="image/png")
 
 
-handler = Mangum(app)
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+handler = Mangum(app, "off")
