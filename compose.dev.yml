@@ -1,0 +1,24 @@
+services:
+  api:
+    image: qrcode-api-dev
+    container_name: qrcode-api-dev
+    build:
+      context: .
+      dockerfile: ./development/Dockerfile
+    working_dir: /app/app
+    volumes:
+      - ".:/app/app"
+    ports:
+      - 8000:8000
+    command:
+      [
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+        "--reload",
+      ]
+    environment:
+      - WATCHFILES_FORCE_POLLING=true
