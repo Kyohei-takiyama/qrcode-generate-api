@@ -4,7 +4,7 @@ services:
     container_name: qrcode-api
     build:
       context: .
-      dockerfile: ./deployment/Dockerfile
+      dockerfile: ./.docker/deployment/Dockerfile
     ports:
       - 9000:8080
     platform: linux/amd64

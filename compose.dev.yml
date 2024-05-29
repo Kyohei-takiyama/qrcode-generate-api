@@ -4,7 +4,7 @@ services:
     container_name: qrcode-api-dev
     build:
       context: .
-      dockerfile: ./development/Dockerfile
+      dockerfile: ./.docker/development/Dockerfile
     working_dir: /app/app
     volumes:
       - ".:/app/app"
