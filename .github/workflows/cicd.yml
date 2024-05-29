@@ -1,0 +1,68 @@
+name: Web API Deploy Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      erc_repository:
+        description: "The name of the ECR repository"
+        required: true
+        type: string
+      lambda_function_name:
+        description: "The name of the Lambda function"
+        required: true
+        type: string
+      aws_region:
+        description: "The AWS region"
+        required: true
+        type: string
+      environment:
+        description: "The environment to deploy to"
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: set aws role to assume
+        run: |
+          if [ "${{ inputs.environment }}" = "production" ]; then
+              echo "AWS_ROLE_ARN=${{ secrets.PROD_AWS_ROLE_ARN }}" >> $GITHUB_ENV
+          else
+              echo "AWS_ROLE_ARN=${{ secrets.DEV_AWS_ROLE_ARN }}" >> $GITHUB_ENV
+          fi
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ inputs.aws_region }}
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        id: build-image
+        with:
+          context: ./
+          file: ./deployment/Dockerfile
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_repository }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false
+          target: main
+          platforms: linux/arm64
+
+      - name: Deploy to Lambda
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          aws lambda update-function-code --function-name ${{ inputs.lambda_function_name }} --image-uri $ECR_REGISTRY/${{ inputs.ecr_repository }}:${{ github.sha }}
+          aws lambda wait function-updated --function-name ${{ inputs.lambda_function_name }}

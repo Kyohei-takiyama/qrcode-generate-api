@@ -1,0 +1,24 @@
+name: Deploy to Development
+
+# todo:今はmainブランチだが、developmentブランチに変更する
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/**"
+      - "app/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy_api:
+    uses: ./.github/workflows/cicd.yml
+    with:
+      erc_repository: dev-qrcode-generator-dev
+      lambda_function_name: dev-qrcode-generator-lambda
+      aws_region: ap-northeast-1
+      environment: development
+    secrets: inherit
