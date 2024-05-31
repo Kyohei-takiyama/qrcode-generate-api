@@ -22,3 +22,13 @@ jobs:
       aws_region: ap-northeast-1
       environment: development
     secrets: inherit
+  slack_notification:
+    uses: ./.github/workflows/slack_notify.yml
+    with:
+      slack_channel: info-gha
+      slack_color: good
+      slack_username: GitHub Actions
+      slack_icon: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+      slack_title: Deployment to Development
+      slack_message: The deployment to the development environment has been completed successfully.
+    secrets: inherit
