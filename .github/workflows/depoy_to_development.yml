@@ -23,12 +23,27 @@ jobs:
       environment: development
     secrets: inherit
   slack_notification:
-    uses: ./.github/workflows/slack_notify.yml
-    with:
-      slack_channel: info-gha
-      slack_color: good
-      slack_username: GitHub Actions
-      slack_icon: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
-      slack_title: Deployment to Development
-      slack_message: The deployment to the development environment has been completed successfully.
-    secrets: inherit
+    # deploy_apiの後に実行されるようにする
+    needs: deploy_api
+    # deploy_apiが成功していても失敗していても実行されるようにする
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Slack Message
+        id: set_slack_msg
+        run: |
+          if [[ "${{ needs.deploy_api.result }}" == "success" ]]; then
+            echo "::set-output name=slack_message::':white_check_mark: Deployment successful'"
+          else
+            echo "::set-output name=slack_message::':x: Deployment failed'"
+          fi
+      - name: Slack Notification
+        uses: ./.github/workflows/slack_notify.yml
+        with:
+          slack_channel: info-gha
+          # needs.<job_id>.resultで前のジョブの結果を参照できる(success、failure、cancelled、および skipped)
+          slack_color: ${{ needs.deploy_api.result == 'success' && 'good' || 'danger' }}
+          slack_username: GitHub Actions Results
+          slack_icon: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+          slack_title: Deployment to Development dev-qrcode-generator-lambda
+          slack_message: ${{ steps.set_slack_msg.outputs.slack_message }}
