@@ -4,12 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 import qrcode
 from io import BytesIO
-import os
-import sys
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
-search_path = sys.path
-print("search_path: main ", search_path)
 
 from util.s3 import S3Client, S3PresignedUrlRequest, S3ClientWithCredentials
 
