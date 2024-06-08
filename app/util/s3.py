@@ -59,8 +59,8 @@ class S3ClientWithCredentials:
         self.s3 = boto3.client(
             "s3",
             region_name="ap-northeast-1",
-            access_key=access_key,
-            secret_key=secret_key,
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key,
             config=Config(s3={"addressing_style": "path"}, signature_version="s3v4"),
         )
 
