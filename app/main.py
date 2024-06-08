@@ -5,6 +5,8 @@ from mangum import Mangum
 import qrcode
 from io import BytesIO
 
+from app.util.s3 import S3Client, S3PresignedUrlRequest, S3ClientWithCredentials
+
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 app.add_middleware(
     CORSMiddleware,
@@ -40,6 +42,24 @@ def generate_qrcode(url: str):
 
     # return png image with response
     return Response(content=img_bytes.getvalue(), media_type="image/png")
+
+
+@app.post("/presigned-url")
+def generate_presigned_url(request: S3PresignedUrlRequest):
+    s3_client = S3Client()
+    presigned_url = s3_client.generate_presigned_url(
+        request.filename, request.bucket, request.expires_in
+    )
+    return {"presigned_url": presigned_url}
+
+
+@app.post("/presigned-url/credentials")
+def generate_presigned_url(request: S3PresignedUrlRequest):
+    s3_client = S3ClientWithCredentials()
+    presigned_url = s3_client.generate_presigned_url(
+        request.filename, request.bucket, request.expires_in
+    )
+    return {"presigned_url": presigned_url}
 
 
 handler = Mangum(app, "off")

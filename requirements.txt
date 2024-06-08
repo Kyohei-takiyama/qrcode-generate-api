@@ -4,3 +4,4 @@ mangum
 aws-lambda-powertools
 qrcode
 Pillow
+boto3
