@@ -5,7 +5,7 @@ from mangum import Mangum
 import qrcode
 from io import BytesIO
 
-from app.util.s3 import S3Client, S3PresignedUrlRequest, S3ClientWithCredentials
+from .util.s3 import S3Client, S3PresignedUrlRequest, S3ClientWithCredentials
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 app.add_middleware(
