@@ -1,5 +1,11 @@
 import logging
 from pydantic import BaseModel
+import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
+search_path = sys.path
+print("search_path: s3 ", search_path)
 
 import boto3
 from botocore.client import Config
