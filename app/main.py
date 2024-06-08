@@ -5,7 +5,12 @@ from mangum import Mangum
 import qrcode
 from io import BytesIO
 
-from util.s3 import S3Client, S3PresignedUrlRequest, S3ClientWithCredentials
+from util.s3 import (
+    S3Client,
+    S3PresignedUrlRequest,
+    S3ClientWithCredentials,
+    S3PresignedUrlCredentialsRequest,
+)
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 app.add_middleware(
@@ -54,8 +59,8 @@ def generate_presigned_url(request: S3PresignedUrlRequest):
 
 
 @app.post("/presigned-url/credentials")
-def generate_presigned_url(request: S3PresignedUrlRequest):
-    s3_client = S3ClientWithCredentials()
+def generate_presigned_url(request: S3PresignedUrlCredentialsRequest):
+    s3_client = S3ClientWithCredentials(request.access_key, request.secret_key)
     presigned_url = s3_client.generate_presigned_url(
         request.filename, request.bucket, request.expires_in
     )

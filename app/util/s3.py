@@ -13,6 +13,14 @@ class S3PresignedUrlRequest(BaseModel):
     expires_in: int
 
 
+class S3PresignedUrlCredentialsRequest(BaseModel):
+    filename: str
+    bucket: str
+    expires_in: int
+    access_key: str
+    secret_key: str
+
+
 class S3Client:
     def __init__(self):
         self.s3 = boto3.client(
@@ -47,10 +55,12 @@ class S3Client:
 
 
 class S3ClientWithCredentials:
-    def __init__(self):
+    def __init__(self, access_key, secret_key):
         self.s3 = boto3.client(
             "s3",
             region_name="ap-northeast-1",
+            access_key=access_key,
+            secret_key=secret_key,
             config=Config(s3={"addressing_style": "path"}, signature_version="s3v4"),
         )
 
